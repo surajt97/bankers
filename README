@@ -1,0 +1,98 @@
+-------------------------------
+*  S  E  T  U  P 
+-------------------------------
+Download banker.c and place in a working directory
+
+File was created from a command line terminal, edited with gedit
+Tested on Ubuntu 14.04 LTS machine
+
+Compile using: 
+
+gcc -o banker banker.c
+
+Run using:
+
+./banker config 		(takes any config filename)
+
+-------------------------------
+*  C  O  N  F  I  G  
+-------------------------------
+
+Basic config file contains:
+2		<-- number of resource types (set up available)
+2 2		<-- num of r1, r2 and so on if they were there
+3		<-- num of processes
+1 2		<-- Maximum need for process 1
+2 1		<-- Maximum need for process 2
+1 2		<-- Maximum need for process 3
+		<-- and so on if needed
+
+//allocated is initialized to all 0 per process
+//need is initialized to max
+//finish is initialized to all FALSE
+//
+//available is initialized by first two lines
+//
+//each line is read up to 80 chars
+//
+
+Build your own config to test certain scenarios!
+
+-------------------------------
+*  O  P  E  R  A  T  I  O  N  
+-------------------------------
+
+Random chance dictates when/how processes will request resources
+
+At the top, banker.c defines 
+
+#define MAX_RANDOM_WAIT 2 //in seconds
+#define RAND_REQUEST 20
+
+MAX_RANDOM_WAIT slows the program so you can watch as you go
+RAND_REQUEST is a percentage of the time that a resource is not requested
+
+a main loop in main does the following
+
+// start the main loop 
+	int count;			//counts how many processes have yet to finish
+ 	do {  
+ 		count = 0; 		//initialize every loop
+					// check the number of running processes 
+		for( i=0; i<processes; i++ ) {  
+			if( Finish[i] == FALSE ) {
+				count++;
+				//requests a resource at random
+				//this could certainly be multithreaded starting here
+				//using createThread in the pthreads library
+				requestResource(i); 
+				?
+
+				//if threaded starting here, you may wait for all 
+				//threads to return here before continuing
+				?
+			} 
+		}
+		if (DEBUG){
+			printf("Loop complete, Running:%d processes of %d\n",count, processes);  
+			//printResources();
+		}
+ 	} while( count != 0 ); 
+
+-------------------------------------------------
+*  M  O  D  I  F  I  C  A  T  I  O  N
+------------------------------------------------
+
+This program can be modified with added threading from PThreads (easiest is from the main loop, cleanest is by creating a new customer class). If this is done, you will need mutex locks for shared data structures. Well implemented ideas will be given partial credit.
+
+The program can also be modified for deadlock detection by doing the following:
+- never add provisionally, always add whether safe or not
+- run banker's algorithm on current state to see if any safe sequence still exists
+- recover by reloading everything (but you may need a new random seed)
+
+The two programs can be submitted separately to avoid confusion. 
+
+Modifications can be massive or minimal, they just need some way of tracking.
+
+Goal is to have fun and learn.
+
